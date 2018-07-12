@@ -1,5 +1,6 @@
 package com.lh.storm;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
@@ -8,12 +9,15 @@ import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * 订阅 split sentence bolt的输出流，实现单词计数，并发送当前计数给下一个bolt
  */
+@Slf4j
 public class WordCountBolt extends BaseRichBolt {
 
     private OutputCollector collector;
@@ -37,10 +41,12 @@ public class WordCountBolt extends BaseRichBolt {
             count++;
             counts.put(word, count);
         }
+        log.warn("result:" + word + "[" + count + "]");
         this.collector.emit(new Values(word, count));
     }
 
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
         declarer.declare(new Fields("word", "count"));
     }
+
 }
